@@ -14,9 +14,7 @@ const UserSchema = new Schema({
 
 export const User = model<any>('User',UserSchema)
 
-//หน้าบ้านส่งมาให้ตัวแปล
-// const name ="";
-// User.create({ name: name }); 
+
 
 
 export default defineEventHandler( async (event) =>{

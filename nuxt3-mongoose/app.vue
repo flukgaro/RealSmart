@@ -192,17 +192,12 @@
   flex: 1;
   padding: 10px;
   border: 1px solid;
-  /* เพิ่ม padding หากต้องการ */
 }
-
-/* ตัวอย่างการจัดเรียงเพิ่มเติม */
 
 .box-right {
   display: flex;
-  /* เพิ่มสีพื้นหลังเพื่อดูการแบ่งพื้นที่ */
 }
 
-/* CSS สำหรับป๊อปอัพ */
 .popup {
   display: block;
   position: fixed;
@@ -210,13 +205,10 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 80%;
-  /* เพิ่มความกว้างของป๊อปอัพ */
   max-width: 600px;
-  /* กำหนดความกว้างสูงสุด */
   height: 80%;
   max-height: 600px;
   padding: 40px;
-  /* เพิ่ม padding เพื่อให้ป๊อปอัพดูใหญ่ขึ้น */
   padding: 20px;
   background-color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -239,14 +231,14 @@
 import { ref, onMounted } from 'vue'
 
 // ตัวแปรเพื่อเก็บ timestamp
-const timestamp = ref(Date.now()); // ใช้ timestamp ปัจจุบันหรือกำหนดเอง
+const timestamp = ref(Date.now());
 const formattedDate = ref('');
 const isSaveEnabled = ref(false);
-// ฟังก์ชันเพื่อแปลง timestamp เป็นวันที่ในรูปแบบ dd-mm-yyyy
+// แปลง timestamp  dd-mm-yyyy
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มจาก 0
+  const month = String(date.getMonth() + 1).padStart(2, '0'); 
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
@@ -278,27 +270,19 @@ const initializeData = async () => {
 };
 onMounted(async () => {
   formattedDate.value = formatDate(timestamp.value);
-  // const response = await fetch('http://localhost:3001/users')
-  // users.value = await response.json()
+ 
   initializeData();
 
 
 })
-console.log(users.value);
-// const birthday = ref('');
-// const formattedDate = ref('');
 
 
 const name = ref('');
-//const createDate = ref('');
-//const createDateTimestamp = ref(''); //DD-MM-YYYY
 const text = ref('');
 
 const addUserName = async () => {
 
   try {
-    //createDateTimestamp.value = new Date(createDate.value).getTime();
-    // console.log(createDateTimestamp)
     const response = await fetch('http://localhost:3001/users', {
       headers: {
         'Content-Type': 'application/json',
@@ -307,7 +291,7 @@ const addUserName = async () => {
       body: JSON.stringify({ name: name.value, dateCreate: formattedDate.value, text: text.value }),
     });
     const result = await response.json();
-    console.log("result: " + result);
+    //console.log("result: " + result);
     hidePopupAdd();
 
   } catch (err) {
@@ -357,7 +341,7 @@ const updateUser = async (id) => {
 
     const result = await response.json();
     console.log('result:', result);
-    // อัปเดตข้อมูลผู้ใช้ใน users.value
+    // อัปเดตข้อมูลผู้ใช้ใน users
     const updatedUsers = users.value.map(user => {
       if (user.id === id) {
         return { ...user, text: text.value };
@@ -413,27 +397,27 @@ function hidePopupEdit() {
 
 const isTextDragged = ref(false); // ตัวแปรเพื่อเช็คสถานะการลากของ text
 const isDateDragged = ref(false); // ตัวแปรเพื่อเช็คสถานะการลากของ date
+
 //ลาก
 const drag = (event) => {
-  // กำหนดข้อมูลที่ลาก
   event.dataTransfer.setData('text/plain', event.target.id);
 };
 
-// ฟังก์ชันจัดการการวาง
+//วาง
 const drop = (event) => {
   event.preventDefault();
   const data = event.dataTransfer.getData('text/plain');
   const draggedElement = document.getElementById(data);
 
   if (draggedElement) {
-    // ตรวจสอบว่า element ถูกลากมาจาก box-left เท่านั้น
+    //  element ลากมาจาก box-left 
     if (draggedElement.parentNode.classList.contains('box-left') || !event.target.classList.contains('box-right')) {
       const clone = draggedElement.cloneNode(true);
       clone.setAttribute('draggable', 'true');
       clone.addEventListener('dragstart', drag);
 
       if (event.target.classList.contains('box-right')) {
-        // ย้ายเนื้อหาจาก box-left ไป box-right หรือ vice versa
+        //move left->right
         event.target.appendChild(clone);
         if (data === 'text') {
           isTextDragged.value = true; // ตั้งค่าสถานะการลาก text
@@ -444,14 +428,13 @@ const drop = (event) => {
           isSaveEnabled.value = true;
         }
       } else if (event.target.id === 'input-text') {
-        // วาง div ข้างๆ input
         event.target.parentElement.insertBefore(clone, event.target.nextSibling);
       }
     }
   }
 };
 
-// ฟังก์ชันอนุญาตให้การวางเกิดขึ้น
+
 const allowDrop = (event) => {
   event.preventDefault();
 };
