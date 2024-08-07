@@ -30,15 +30,17 @@
           <div class="from-popup">
             <div>
               <label for="name">Name:</label>
-              <input class="input-box" type="text" id="name" v-model="name" required />
+              <input class="input-name" type="text" id="name" v-model="name" required />
             </div>
-            <button :disabled="!isSaveEnabled" class="btn-save" type="submit">Save</button>
+            <div>
+              <button :disabled="!isSaveEnabled" class="btn-save" type="submit">Save</button>
+            </div>
 
           </div>
           <div class="add-flex">
             <div class="box-left" @drop="drop" @dragover="allowDrop">
-              <div id="text" v-if="!isTextDragged" draggable="true" @dragstart="drag">
-                <input class="input-box" type="text" id="input-text" v-model="text" required />
+              <div class="input-div" id="text" v-if="!isTextDragged" draggable="true" @dragstart="drag">
+                <input class="input-popup" type="text" id="input-text" v-model="text" required placeholder="ใส่ข้อความ" />
               </div>
               <div class="dateC" id="dateC" v-if="!isDateDragged" draggable="true" @dragstart="drag">
                 {{ formattedDate }}
@@ -47,7 +49,7 @@
             <div class="box-right" id="box-right" @drop="drop" @dragover="allowDrop">
             </div>
           </div>
-          
+
         </div>
       </form>
 
@@ -59,8 +61,8 @@
           <div class="from-popup">
             <div>
               <label for="name">Name:</label>
-              <input class="input-box" :placeholder="selectedUser.name" type="text" id="editName"
-                v-model="selectedUser.name" required />
+              <input class="input-name" :placeholder="selectedUser.name" type="text" id="editName" v-model="name"
+                required />
             </div>
             <button class="btn-save" type="submit">Save</button>
 
@@ -70,8 +72,7 @@
             </div>
             <div class="box-right" id="box-right" @drop="drop" @dragover="allowDrop">
               <div id="text" draggable="true" @dragstart="drag">
-                <input class="input-box" type="text" id="text" v-model="text" required
-                  :placeholder="selectedUser.text" />
+                <input class="input-box" type="text" id="text" v-model="text" :placeholder="selectedUser.text" />
               </div>
               <div class="dateC">
                 <label for="editCreateDate">{{ selectedUser.dateCreate }}</label>
@@ -79,7 +80,7 @@
             </div>
 
           </div>
-          
+
         </div>
       </form>
     </div>
@@ -110,15 +111,6 @@
   flex: 1;
 }
 
-.dateC {
-  height: 38px;
-  margin: 10px 0;
-  border: 1px solid;
-  text-align: center;
-  line-height: 38px;
-  padding: 2px;
-}
-
 .btn-add {
   width: 50px;
   height: 30px;
@@ -142,7 +134,8 @@
   border-radius: 5px;
   cursor: pointer;
 }
-.btn-close{
+
+.btn-close {
   width: 50px;
   height: 30px;
   text-align: center;
@@ -172,12 +165,38 @@
   display: flex;
   justify-content: space-between;
   margin: 5px 0;
+  align-items: center;
 }
 
 .input-box {
   height: 40px;
   padding: 0;
   margin: 10px 0;
+  width: 100%;
+}
+
+.input-name {
+  height: 40px;
+  padding: 0;
+  margin: 10px 0;
+  
+}
+
+.input-popup {
+  height: 40px;
+  padding: 0;
+  margin: 10px auto;
+  width: 100%;
+  text-align: center;
+}
+
+.dateC {
+  height: 38px;
+  margin: 10px auto;
+  border: 1px solid;
+  text-align: center;
+  line-height: 38px;
+  padding: 2px;
 }
 
 .add-flex {
@@ -238,7 +257,7 @@ const isSaveEnabled = ref(false);
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); 
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
@@ -270,7 +289,7 @@ const initializeData = async () => {
 };
 onMounted(async () => {
   formattedDate.value = formatDate(timestamp.value);
- 
+
   initializeData();
 
 
@@ -291,7 +310,7 @@ const addUserName = async () => {
       body: JSON.stringify({ name: name.value, dateCreate: formattedDate.value, text: text.value }),
     });
     const result = await response.json();
-    //console.log("result: " + result);
+    fetchUsers();
     hidePopupAdd();
 
   } catch (err) {
@@ -332,7 +351,7 @@ const updateUser = async (id) => {
         'Content-Type': 'application/json',
       },
       method: 'PATCH',
-      body: JSON.stringify({ text: text.value }),
+      body: JSON.stringify({ name: name.value, text: text.value }),
     });
 
     if (!response.ok) {
@@ -388,10 +407,14 @@ function hidePopupAdd() {
 
 function showPopupEdit(user) {
   selectedUser.value = user;
+  name.value = selectedUser.value.name;
+  text.value = selectedUser.value.text;
   isPopupEditVisible.value = true
 }
 
 function hidePopupEdit() {
+  name.value = "";
+  text.value = "";
   isPopupEditVisible.value = false
 }
 
